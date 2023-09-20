@@ -16,7 +16,6 @@ namespace UseWhatYouGet.Rando {
 			[MenuLabel("Allow Overcharm")]
 			public bool AllowOvercharm { get; set; } = false;
 
-			[MenuIgnore]
 			[MenuLabel("Keep Notches Full")]
 			public bool KeepFull { get; set; } = false;
 		}

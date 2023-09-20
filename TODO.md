@@ -47,7 +47,7 @@
 
 - [ ] **Charms** - Automatically keeps your most recently picked up charms equipped. You have to use what you get!
   - [x] **Allow Overcharming** *(default: false)* - Auto-equipping no longer cares about the cost of the charm you picked up. If there's one free notch, or one notch can be freed by unequipping old charms, the new charm WILL be equipped. 
-  - [ ] **Keep Notches Filled** *(default: false)* - If you pick up a notch, and it creates enough room for the most recently unequipped charm(s), they will be re-equipped to fill up the space.
+  - [x] **Keep Notches Filled** *(default: false)* - If you pick up a notch, and it creates enough room for the most recently unequipped charm(s), they will be re-equipped to fill up the space.
 - [ ] **Spells** - Only your most recently obtained spell is usable. Good luck! *(Note: Using this option with Fireball Skips on can hardlock you. Breakable floors will break in response to any spell being used while you're standing on them.)*
   - [ ] **Replace Junk With Extra Spells** *(default: 0)* - Adds the specified number of extra copies of each spell to the pool of junk items, for some extra spice.
 - [ ] **Nail Arts** - Only your most recently obtained nail art is usable. Good luck!
