@@ -1,11 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UseWhatYouGet.Settings {
-	public class UwygLocalSettings {
+	public class LocalSettings {
 		public List<int> CharmHistory = new();
 		public List<int> EquippedCharms = new();
 	}

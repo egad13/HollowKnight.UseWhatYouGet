@@ -1,14 +1,15 @@
+using ItemChanger;
+using Modding;
+using Newtonsoft.Json;
+using Osmi.Game;
 using System;
 using System.Reflection;
-using Modding;
-using ItemChanger;
-using IC_CharmItem = ItemChanger.Items.CharmItem;
 using UseWhatYouGet.Settings;
-using Osmi.Game;
+using IC_CharmItem = ItemChanger.Items.CharmItem;
 
 namespace UseWhatYouGet {
 
-	public class UseWhatYouGetMod : Mod, ILocalSettings<UwygLocalSettings> {
+	public class UseWhatYouGetMod : Mod, ILocalSettings<LocalSettings>, IGlobalSettings<GlobalSettings> {
 		private static UseWhatYouGetMod? _instance;
 
 		internal static UseWhatYouGetMod Instance {
@@ -27,9 +28,13 @@ namespace UseWhatYouGet {
 
 		public override string GetVersion() => GetType().Assembly.GetName().Version.ToString();
 
-		public static UwygLocalSettings LS = new();
-		public void OnLoadLocal(UwygLocalSettings ls) => LS = ls;
-		public UwygLocalSettings OnSaveLocal() => LS;
+		public static LocalSettings LS = new();
+		public void OnLoadLocal(LocalSettings ls) => LS = ls;
+		public LocalSettings OnSaveLocal() => LS;
+
+		public static GlobalSettings GS = new();
+		public void OnLoadGlobal(GlobalSettings gs) => GS = gs;
+		public GlobalSettings OnSaveGlobal() => GS;
 
 		public UseWhatYouGetMod() : base("UseWhatYouGet") {
 			_instance = this;
@@ -38,11 +43,35 @@ namespace UseWhatYouGet {
 		public override void Initialize() {
 			Log("Initializing");
 
-			// put additional initialization logic here
-			AbstractItem.OnGiveGlobal += AddNewCharm;
-			// TODO remove user's ability to remove auto-equipped charms. treat em all like voidheart.
+			HookIC();
+			if (ModHooks.GetMod("Randomizer 4") is Mod) {
+				Rando.RandoInterop.HookRandomizer();
+			}
 
 			Log("Initialized");
+		}
+
+		private void HookIC() {
+			ItemChanger.Events.OnItemChangerHook += EnterGameHook;
+			ItemChanger.Events.OnItemChangerUnhook += ExitGameHook;
+		}
+
+		private void EnterGameHook() {
+			if (GS.RandoSettings.Enabled) {
+
+				if (GS.RandoSettings.Charms.Enabled) {
+					AbstractItem.OnGiveGlobal += AddNewCharm;
+					// TODO remove user's ability to remove auto-equipped charms. treat em all like voidheart.
+				}
+
+			}
+			Log("===============================================================");
+			Log($"UWYG RANDO SETTINGS:\n{JsonConvert.SerializeObject(GS.RandoSettings)}");
+			Log("===============================================================");
+		}
+
+		private void ExitGameHook() {
+			AbstractItem.OnGiveGlobal -= AddNewCharm;
 		}
 
 		private void AutoEquip(int charmNum) {

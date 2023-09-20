@@ -1,8 +1,8 @@
 # Todo list
 
 ## Misc
-- [ ] Make the menu page show up when creating a new game
-- [ ] Add all the menu options we need (and then comment out the ones not in use)
+- [x] Make the menu page show up when creating a new game
+- [x] Add all the menu options we need (and then comment out the ones not in use)
 - [ ] Can we make a popup in the corner (after the item get popup) that shows what charms/spell/art/dir was unequipped when we replace stuff? Investigate that.
 
 ## Logic
