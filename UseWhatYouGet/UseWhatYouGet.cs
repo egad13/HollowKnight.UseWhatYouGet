@@ -60,8 +60,7 @@ namespace UseWhatYouGet {
 			if (GS.RandoSettings.Enabled) {
 
 				if (GS.RandoSettings.Charms.Enabled) {
-					AbstractItem.OnGiveGlobal += AddNewCharm;
-					// TODO remove user's ability to remove auto-equipped charms. treat em all like voidheart.
+					Charms.PickupBehaviour.Hook();
 				}
 
 			}
@@ -71,56 +70,7 @@ namespace UseWhatYouGet {
 		}
 
 		private void ExitGameHook() {
-			AbstractItem.OnGiveGlobal -= AddNewCharm;
-		}
-
-		private void AutoEquip(int charmNum) {
-			CharmUtil.EquipCharm(charmNum);
-			LS.EquippedCharms.Add(charmNum);
-			string bleh = "";
-			for (int i = 0; i < LS.EquippedCharms.Count; i++) {
-				bleh += $"{LS.EquippedCharms[i]}, ";
-			}
-			Log($"Equipment in order: [{bleh}]");
-		}
-
-		private int AutoUnequip() {
-			var charmNum = LS.EquippedCharms[0];
-			CharmUtil.UnequipCharm(charmNum);
-			LS.EquippedCharms.Remove(charmNum);
-			return charmNum;
-		}
-
-		private void AddNewCharm(ReadOnlyGiveEventArgs args) {
-			if (args.Item is not IC_CharmItem) { return; }
-			var pd = PlayerData.instance;
-			var itm = (IC_CharmItem) args.Item;
-
-			Log("===============================================================");
-			Log($"CHARM GIVEN: name '{itm.name}' | charmNum {itm.charmNum}");
-			Log($"> COST: {pd.GetInt($"charmCost_{itm.charmNum}")}");
-			RecursiveLogAllProps(itm);
-			Log("===============================================================");
-
-			LS.CharmHistory.Add(itm.charmNum);
-
-			int slotsMax = pd.GetInt("charmSlots"),
-				slotsUsed = pd.GetInt("charmSlotsFilled"),
-				cost = pd.GetInt($"charmCost_{itm.charmNum}");
-
-			if (slotsMax >= cost) {
-				// unequip oldest charm until there's room for the new one
-				Log($"slotMax {slotsMax}, slotUsed {slotsUsed}, cost {cost}");
-				while ((slotsMax - slotsUsed) < cost) {
-					Log($"Unequipping {LS.EquippedCharms[0]}");
-					var removed = AutoUnequip();
-					slotsUsed -= pd.GetInt($"charmCost_{removed}");
-				}
-
-				AutoEquip(itm.charmNum);
-
-				CharmUtil.UpdateCharm();
-			}
+			Charms.PickupBehaviour.Unhook();
 		}
 
 
