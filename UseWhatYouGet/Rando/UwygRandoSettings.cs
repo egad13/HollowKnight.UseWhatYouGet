@@ -13,7 +13,6 @@ namespace UseWhatYouGet.Rando {
 		public class CharmSettings {
 			public bool Enabled { get; set; } = false;
 
-			[MenuIgnore]
 			[MenuLabel("Allow Overcharm")]
 			public bool AllowOvercharm { get; set; } = false;
 

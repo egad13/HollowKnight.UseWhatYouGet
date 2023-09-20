@@ -34,7 +34,7 @@ namespace UseWhatYouGet.Charms {
 
 			int slotsMax = pd.GetInt("charmSlots"),
 				slotsUsed = pd.GetInt("charmSlotsFilled"),
-				cost = CharmUtil.GetCharmCost(itm.charmNum);
+				cost = Settings.AllowOvercharm ? 1 : CharmUtil.GetCharmCost(itm.charmNum);
 
 			// Unequip oldest charm until there's room for a new one
 			while((slotsMax - slotsUsed) < cost && SaveData.EquippedCharms.Count > 0) {
