@@ -19,7 +19,6 @@ namespace UseWhatYouGet.Charms {
 			if (Settings.KeepFull) {
 				AbstractItem.AfterGiveGlobal += NotchGiven;
 			}
-			// TODO remove user's ability to remove auto-equipped charms. treat em all like voidheart.
 		}
 
 		public static void Unhook() {

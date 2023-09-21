@@ -1,7 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using ItemChanger;
+using Newtonsoft.Json;
 using RandomizerMod.Logging;
 using RandomizerMod.RandomizerData;
+using RandomizerMod.RC;
 using System.IO;
+using UseWhatYouGet.IC;
 
 namespace UseWhatYouGet.Rando {
 	internal static class RandoInterop {
@@ -10,6 +13,7 @@ namespace UseWhatYouGet.Rando {
 		public static void HookRandomizer() {
 			ConnectionMenu.Hook();
 			SettingsLog.AfterLogSettings += AddUwygSettings;
+			RandoController.OnExportCompleted += OnExportCompleted;
 		}
 
 		private static void AddUwygSettings(LogArguments arguments, TextWriter writer) {
@@ -17,6 +21,14 @@ namespace UseWhatYouGet.Rando {
 			using JsonTextWriter jtw = new(writer) { CloseOutput = false };
 			JsonUtil._js.Serialize(jtw, Settings);
 			writer.WriteLine();
+		}
+
+		private static void OnExportCompleted(RandoController controller) {
+			if (!Settings.Enabled) { return; }
+
+			if (Settings.Charms.Enabled) {
+				ItemChangerMod.Modules.GetOrAdd<CharmPreventEquipModule>();
+			}
 		}
 	}
 }

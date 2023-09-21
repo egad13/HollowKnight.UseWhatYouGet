@@ -9,7 +9,7 @@
 
 - [ ] Charms
   - [x] Make auto-equipping and unequipping function
-  - [ ] Make sure the player can look at the charms, but cannot manually equip/unequip them.
+  - [x] Make sure the player can look at the charms, but cannot manually equip/unequip them.
   - [ ] How should breaking a fragile charm work? Investigate how that all works and decide on behaviour.
   - [ ] Make sure checks with charm-equipped requirements function if you *possess* the charm they need, regardless of equip status
     - [ ] Lifeblood door in the abyss
