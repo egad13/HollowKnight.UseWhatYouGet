@@ -1,10 +1,8 @@
-﻿using ItemChanger;
-using ItemChanger.Items;
+﻿using Modding;
 using Osmi.Game;
 using System.Collections.Generic;
 using System.Linq;
 using UseWhatYouGet.Rando;
-using IC_CharmItem = ItemChanger.Items.CharmItem;
 
 namespace UseWhatYouGet.Charms {
 	internal class PickupBehaviour {
@@ -15,29 +13,30 @@ namespace UseWhatYouGet.Charms {
 		public static void Hook() {
 			if (!Settings.Enabled) { return; }
 
-			AbstractItem.OnGiveGlobal += CharmGiven;
+			ModHooks.SetPlayerBoolHook += CharmGiven;
 			if (Settings.KeepFull) {
-				AbstractItem.AfterGiveGlobal += NotchGiven;
+				ModHooks.SetPlayerBoolHook += NotchGiven;
 			}
 		}
 
 		public static void Unhook() {
-			AbstractItem.OnGiveGlobal -= CharmGiven;
-			AbstractItem.AfterGiveGlobal -= NotchGiven;
+			ModHooks.SetPlayerBoolHook -= CharmGiven;
+			ModHooks.SetPlayerBoolHook -= NotchGiven;
 		}
 
 		// MODHOOKS
 
-		private static void CharmGiven(ReadOnlyGiveEventArgs args) {
-			if (args.Item is not IC_CharmItem) { return; }
-			var pd = PlayerData.instance;
-			var itm = (IC_CharmItem)args.Item;
+		private static bool CharmGiven(string boolName, bool value) {
+			if (!boolName.StartsWith("gotCharm") || !value) { return value; }
 
-			SaveData.CharmHistory.Add(itm.charmNum);
+			var pd = PlayerData.instance;
+			int charmNum = int.Parse(boolName.Split('_')[1]);
+
+			SaveData.CharmHistory.Add(charmNum);
 
 			int slotsMax = pd.GetInt("charmSlots"),
 				slotsUsed = pd.GetInt("charmSlotsFilled"),
-				cost = Settings.AllowOvercharm ? 1 : CharmUtil.GetCharmCost(itm.charmNum);
+				cost = Settings.AllowOvercharm ? 1 : CharmUtil.GetCharmCost(charmNum);
 
 			// Unequip oldest charm until there's room for a new one
 			while((slotsMax - slotsUsed) < cost && SaveData.EquippedCharms.Count > 0) {
@@ -49,15 +48,16 @@ namespace UseWhatYouGet.Charms {
 
 			// Equip new charm (if possible)
 			if (cost <= slotsMax) {
-				SaveData.EquippedCharms.Add(itm.charmNum);
-				CharmUtil.EquipCharm(itm.charmNum);
+				SaveData.EquippedCharms.Add(charmNum);
+				CharmUtil.EquipCharm(charmNum);
 			}
-			
+
 			CharmUtil.UpdateCharm();
+			return value;
 		}
 
-		private static void NotchGiven(ReadOnlyGiveEventArgs args) {
-			if (args.Item is not NotchItem) { return; }
+		private static bool NotchGiven(string boolName, bool value) {
+			if (!boolName.StartsWith("notch") && !boolName.StartsWith("salubraNotch")) { return value; }
 
 			// Rebuild the equipped charms list from the charm history, as full as possible
 			int[] reversedHistory = SaveData.CharmHistory.Skip(0).Reverse().ToArray();
@@ -74,13 +74,15 @@ namespace UseWhatYouGet.Charms {
 			}
 
 			// Requip all charms IF NECESSARY.
-			List<int> newCharmList  = reversedHistory.Take(index).Reverse().ToList();
+			List<int> newCharmList = reversedHistory.Take(index).Reverse().ToList();
 
-			if (SaveData.EquippedCharms.Equals(newCharmList)) { return; }
+			if (SaveData.EquippedCharms.Equals(newCharmList)) { return value; }
 
 			SaveData.EquippedCharms = newCharmList;
 			CharmUtil.UnequipAllCharms();
 			CharmUtil.EquipCharms(newCharmList.ToArray());
+			CharmUtil.UpdateCharm();
+			return value;
 
 			// It's done like this to preserve the ordering of the charms in the UI,
 			// which makes it easier to understand what's happening.

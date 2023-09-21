@@ -1,11 +1,9 @@
 using ItemChanger;
 using Modding;
 using Newtonsoft.Json;
-using Osmi.Game;
 using System;
 using System.Reflection;
 using UseWhatYouGet.Settings;
-using IC_CharmItem = ItemChanger.Items.CharmItem;
 
 namespace UseWhatYouGet {
 
@@ -52,8 +50,8 @@ namespace UseWhatYouGet {
 		}
 
 		private void HookIC() {
-			ItemChanger.Events.OnItemChangerHook += EnterGameHook;
-			ItemChanger.Events.OnItemChangerUnhook += ExitGameHook;
+			Events.OnItemChangerHook += EnterGameHook;
+			Events.OnItemChangerUnhook += ExitGameHook;
 		}
 
 		private void EnterGameHook() {
