@@ -27,6 +27,7 @@ namespace UseWhatYouGet.Rando {
 			if (!Settings.Enabled) { return; }
 
 			if (Settings.Charms.Enabled) {
+				ItemChangerMod.Modules.GetOrAdd<CharmAutoEquipModule>();
 				ItemChangerMod.Modules.GetOrAdd<CharmPreventEquipModule>();
 			}
 		}

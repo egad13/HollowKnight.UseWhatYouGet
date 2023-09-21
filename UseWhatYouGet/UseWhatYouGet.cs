@@ -55,20 +55,13 @@ namespace UseWhatYouGet {
 		}
 
 		private void EnterGameHook() {
-			if (GS.RandoSettings.Enabled) {
-
-				if (GS.RandoSettings.Charms.Enabled) {
-					Charms.PickupBehaviour.Hook();
-				}
-
-			}
 			Log("===============================================================");
 			Log($"UWYG RANDO SETTINGS:\n{JsonConvert.SerializeObject(GS.RandoSettings)}");
 			Log("===============================================================");
 		}
 
 		private void ExitGameHook() {
-			Charms.PickupBehaviour.Unhook();
+			// ???
 		}
 
 

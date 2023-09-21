@@ -1,30 +1,29 @@
-﻿using Modding;
+﻿using ItemChanger.Modules;
+using Modding;
 using Osmi.Game;
 using System.Collections.Generic;
 using System.Linq;
 using UseWhatYouGet.Rando;
 
-namespace UseWhatYouGet.Charms {
-	internal class PickupBehaviour {
+namespace UseWhatYouGet.IC {
+	public class CharmAutoEquipModule : Module {
 
 		private static UwygRandoSettings.CharmSettings Settings => UseWhatYouGetMod.GS.RandoSettings.Charms;
 		private static Settings.LocalSettings SaveData => UseWhatYouGetMod.LS;
 
-		public static void Hook() {
-			if (!Settings.Enabled) { return; }
-
+		public override void Initialize() {
 			ModHooks.SetPlayerBoolHook += CharmGiven;
 			if (Settings.KeepFull) {
 				ModHooks.SetPlayerBoolHook += NotchGiven;
 			}
 		}
 
-		public static void Unhook() {
+		public override void Unload() {
 			ModHooks.SetPlayerBoolHook -= CharmGiven;
 			ModHooks.SetPlayerBoolHook -= NotchGiven;
 		}
 
-		// MODHOOKS
+		// HOOKS
 
 		private static bool CharmGiven(string boolName, bool value) {
 			if (!boolName.StartsWith("gotCharm") || !value) { return value; }
@@ -41,7 +40,7 @@ namespace UseWhatYouGet.Charms {
 				cost = Settings.AllowOvercharm ? 1 : CharmUtil.GetCharmCost(charmNum);
 
 			// Unequip oldest charm until there's room for a new one
-			while((slotsMax - slotsUsed) < cost && currentCharms.Count > 0) {
+			while ((slotsMax - slotsUsed) < cost && currentCharms.Count > 0) {
 				var removedNum = currentCharms[0];
 				CharmUtil.UnequipCharm(removedNum);
 				slotsUsed -= CharmUtil.GetCharmCost(removedNum);
