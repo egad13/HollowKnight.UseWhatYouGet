@@ -34,21 +34,21 @@ namespace UseWhatYouGet.Charms {
 
 			SaveData.CharmHistory.Add(charmNum);
 
+			List<int> currentCharms = pd.GetVariable<List<int>>("equippedCharms");
+
 			int slotsMax = pd.GetInt("charmSlots"),
 				slotsUsed = pd.GetInt("charmSlotsFilled"),
 				cost = Settings.AllowOvercharm ? 1 : CharmUtil.GetCharmCost(charmNum);
 
 			// Unequip oldest charm until there's room for a new one
-			while((slotsMax - slotsUsed) < cost && SaveData.EquippedCharms.Count > 0) {
-				var removedNum = SaveData.EquippedCharms[0];
-				SaveData.EquippedCharms.RemoveAt(0);
+			while((slotsMax - slotsUsed) < cost && currentCharms.Count > 0) {
+				var removedNum = currentCharms[0];
 				CharmUtil.UnequipCharm(removedNum);
 				slotsUsed -= CharmUtil.GetCharmCost(removedNum);
 			}
 
 			// Equip new charm (if possible)
 			if (cost <= slotsMax) {
-				SaveData.EquippedCharms.Add(charmNum);
 				CharmUtil.EquipCharm(charmNum);
 			}
 
@@ -58,10 +58,11 @@ namespace UseWhatYouGet.Charms {
 
 		private static bool NotchGiven(string boolName, bool value) {
 			if (!boolName.StartsWith("notch") && !boolName.StartsWith("salubraNotch")) { return value; }
+			var pd = PlayerData.instance;
 
 			// Rebuild the equipped charms list from the charm history, as full as possible
 			int[] reversedHistory = SaveData.CharmHistory.Skip(0).Reverse().ToArray();
-			int slotsMax = PlayerData.instance.GetInt("charmSlots"),
+			int slotsMax = pd.GetInt("charmSlots"),
 				cost = 0,
 				index = 0;
 
@@ -75,10 +76,10 @@ namespace UseWhatYouGet.Charms {
 
 			// Requip all charms IF NECESSARY.
 			List<int> newCharmList = reversedHistory.Take(index).Reverse().ToList();
+			List<int> currentCharms = pd.GetVariable<List<int>>("equippedCharms");
 
-			if (SaveData.EquippedCharms.Equals(newCharmList)) { return value; }
+			if (currentCharms.Equals(newCharmList)) { return value; }
 
-			SaveData.EquippedCharms = newCharmList;
 			CharmUtil.UnequipAllCharms();
 			CharmUtil.EquipCharms(newCharmList.ToArray());
 			CharmUtil.UpdateCharm();
